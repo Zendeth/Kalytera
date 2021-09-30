@@ -1,0 +1,16 @@
+.DS_Store
+
+# Compilation and object files
+obj/
+bin/
+kalytera
+main
+*.o
+
+#some other files
+.vscode/
+.*.swp
+-g
+*.glade~
+res/example.glade
+tmp/*.png
