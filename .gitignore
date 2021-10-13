@@ -8,9 +8,9 @@ main
 *.o
 
 #some other files
+output/
+tmp/
 .vscode/
 .*.swp
 -g
 *.glade~
-res/example.glade
-tmp/*.png
