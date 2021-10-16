@@ -3,7 +3,8 @@
 int main(int argc, char *argv[])
 {
     //Tests
-    loader("samples/sample1.png");
+    Binarize("samples/image_02.jpeg");
+    Reduct_noise("samples/image_02.jpeg");
 
     return EXIT_SUCCESS;
 }

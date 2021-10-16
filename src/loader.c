@@ -1,3 +1,8 @@
+/*
+// Image loader functions
+// Author: Hafid HOUSNI
+*/
+
 #include "loader.h"
 
 // Clean ressources used by SDL
@@ -29,7 +34,7 @@ void init_sdl()
 }
 
 // Load an image
-SDL_Surface* load_img(char *path)
+SDL_Surface *load_img(char *path)
 {
     SDL_Surface *img;
 
@@ -46,8 +51,8 @@ SDL_Surface* load_img(char *path)
     return img;
 }
 
-// Load an image
-int loader(char * file)
+// Load an image and display it
+int loader(char *file)
 {
     SDL_Window *window = NULL;
     SDL_Renderer *renderer = NULL;
