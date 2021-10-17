@@ -5,7 +5,7 @@
 
 CC=gcc
 CFLAGS=-Wall -Wextra -std=c99 -O3 -g
-LDLIBS=-lSDL2 -lSDL2_image
+LDLIBS=-lSDL2 -lSDL2_image -lm
 GTK=`pkg-config --cflags --libs gtk+-3.0` -export-dynamic
 
 
@@ -14,8 +14,13 @@ all: build
 run: build
 	./kalytera
 
-build: setup_directories pixel_operations noisereduction binarize loader main
+build: setup_directories pixel_operations preprocess binarize loader main
 	$(CC) $(CFLAGS) $(LDLIBS) $(GTK) bin/*.o -o kalytera
+
+preprocess: deskew noisereduction
+
+deskew:
+	$(CC) $(CFLAGS) $(LDLIBS) -o bin/deskew.o -c src/deskew.c
 
 noisereduction:
 	$(CC) $(CFLAGS) $(LDLIBS) -o bin/noisereduction.o -c src/noisereduction.c
@@ -37,7 +42,7 @@ setup_directories:
 	mkdir -p bin
 	mkdir -p output
 
-clean: 
+clean:
 	rm kalytera
 	rm -rf tmp
 	rm -rf bin
