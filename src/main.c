@@ -3,8 +3,10 @@
 int main(int argc, char *argv[])
 {
     //Tests
-    Binarize("samples/image_02.jpeg");
-    Reduct_noise("samples/image_02.jpeg");
+    Binarize("samples/image_05.jpeg");
+    Reduct_noise("tmp/binarized.png");
+
+    DeskewImage("tmp/noisereducted.png");
 
     return EXIT_SUCCESS;
 }
