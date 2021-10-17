@@ -1,5 +1,5 @@
 # Kalytera
-Kalytera - OCR project for S3 semester @epita
+Kalytera - OCR and Sudoku solver project for S3 semester @epita
 
 ## Instructions
 
