@@ -168,11 +168,9 @@ SDL_Surface *NoiseReduction(SDL_Surface *image)
     return image;
 }
 
-int Reduct_noise(char *file)
+SDL_Surface *Reduct_noise(SDL_Surface *image)
 {
-    SDL_Surface *image = load_img(file);
     SDL_Surface *noisereducted = NoiseReduction(image);
     IMG_SavePNG(noisereducted, "tmp/noisereducted.png");
-
-    return EXIT_SUCCESS;
+    return noisereducted;
 }

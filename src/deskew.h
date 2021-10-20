@@ -15,9 +15,11 @@
 
 #define M_PI 3.14159265358979323846
 
+double find_angle2(SDL_Surface *image);
+
 double find_angle(SDL_Surface *image);
 SDL_Surface *Rotate(SDL_Surface *image, double angle);
-SDL_Surface *Deskew(SDL_Surface *image);
-int DeskewImage(char *file);
+SDL_Surface *AutoDeskew(SDL_Surface *image);
+SDL_Surface *Deskew(SDL_Surface *image, double angle);
 
 #endif

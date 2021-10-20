@@ -131,16 +131,18 @@ int Otsu(SDL_Surface *image)
 }
 
 // Creates a binarized image file from a colorized one
-int Binarize(char *file)
+SDL_Surface *Binarize(SDL_Surface *image)
 {
-    SDL_Surface *image = load_img(file);
+    // Apply grayscale
     SDL_Surface *grayscaled = Img_to_Grayscale(image);
-    IMG_SavePNG(grayscaled, "tmp/grayscaled.png");
 
+    // Find threshold using Otsu
     int threshold = Otsu(grayscaled);
+
+    // Apply binarization on a grayscale image
     SDL_Surface *binarized = Grayscale_to_Binarization(grayscaled, threshold);
 
     IMG_SavePNG(binarized, "tmp/binarized.png");
 
-    return EXIT_SUCCESS;
+    return binarized;
 }

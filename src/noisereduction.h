@@ -13,7 +13,8 @@
 #include "pixel_operations.h"
 #include "loader.h"
 
+void insertionSort(int arr[], int n);
 SDL_Surface *NoiseReduction(SDL_Surface *image);
-int Reduct_noise(char *file);
+SDL_Surface *Reduct_noise(SDL_Surface *image);
 
 #endif

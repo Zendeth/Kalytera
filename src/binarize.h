@@ -13,12 +13,11 @@
 #include "pixel_operations.h"
 #include "loader.h"
 
-int Grayscale(char *file);
 SDL_Surface *Img_to_Grayscale(SDL_Surface *image);
 
 int Otsu(SDL_Surface *image);
 SDL_Surface *Grayscale_to_Binarization(SDL_Surface *image, int s);
 
-int Binarize(char *file);
+SDL_Surface *Binarize(SDL_Surface *image);
 
 #endif
