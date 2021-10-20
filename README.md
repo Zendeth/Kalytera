@@ -11,18 +11,14 @@ make build
 ```
 
 ### Run
-To run the project, use this command :
+To run the OCR part, use this command :
 
 ```bash
-make run
-```
-or you can use this one :
-```bash
-./kalytera
+./kalytera <your image file>
 ```
 
 ### Clean
-To remove clean files, use this command :
+To clean files, use this command :
 
 ```bash
 make clean
