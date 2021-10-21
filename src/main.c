@@ -4,24 +4,16 @@
 void display(char *path)
 {
     printf("Do you want to display the image? [Y/N]:");
-    char c = getchar();
+    char c;
+    scanf("%c",&c);
     printf("\n");
     if (c == 'Y' || c == 'y')
     {
         loader(path);
     }
-    else if (c != 'N' || c != 'n')
+    if (c != 'Y' && c != 'y' && c != 'N' && c != 'n')
     {
-        while (c != 'N' || c != 'n' || c != 'Y' || c != 'y')
-        {
-            printf("Do you want to display the image? [Y/N]:");
-            c = getchar();
-            printf("\n");
-        }
-        if (c == 'Y' || c == 'y')
-        {
-            loader(path);
-        }
+        display(path);
     }
 }
 
@@ -29,24 +21,16 @@ void display(char *path)
 void image2binarized(SDL_Surface *image)
 {
     printf("Do you want to binarize the image? [Y/N]:");
-    char c = getchar();
+    char c;
+    scanf("%c",&c);
     printf("\n");
     if (c == 'Y' || c == 'y')
     {
         image = Binarize(image);
     }
-    else if (c != 'N' || c != 'n')
+    if (c != 'Y' && c != 'y' && c != 'N' && c != 'n')
     {
-        while (c != 'N' || c != 'n' || c != 'Y' || c != 'y')
-        {
-            printf("Do you want to binarize the image? [Y/N]:");
-            c = getchar();
-            printf("\n");
-        }
-        if (c == 'Y' || c == 'y')
-        {
-            image = Binarize(image);
-        }
+        image2binarized(image);
     }
 }
 
@@ -54,24 +38,16 @@ void image2binarized(SDL_Surface *image)
 void noisereduc(SDL_Surface *image)
 {
     printf("Do you want to reduce noise of the image? [Y/N]:");
-    char c = getchar();
+    char c;
+    scanf("%c",&c);
     printf("\n");
     if (c == 'Y' || c == 'y')
     {
         image = Reduct_noise(image);
     }
-    else if (c != 'N' || c != 'n')
+    if (c != 'Y' && c != 'y' && c != 'N' && c != 'n')
     {
-        while (c != 'N' || c != 'n' || c != 'Y' || c != 'y')
-        {
-            printf("Do you want to reduce noise of the image? [Y/N]:");
-            c = getchar();
-            printf("\n");
-        }
-        if (c == 'Y' || c == 'y')
-        {
-            image = Reduct_noise(image);
-        }
+        noisereduc(image);
     }
 }
 
@@ -79,28 +55,20 @@ void noisereduc(SDL_Surface *image)
 void Rot(SDL_Surface *image)
 {
     printf("Do you want to rotate the image? [Y/N]:");
-    char c = getchar();
+    char c;
+    scanf("%c",&c);
     printf("\n");
     if (c == 'Y' || c == 'y')
     {
         //TODO: get angle function
-        double angle;
-        image = Deskew(image, angle);
+        printf("Enter the skew angle: ");
+        double a;
+        scanf("%lf",&a);
+        image = Deskew(image, a);
     }
-    else if (c != 'N' || c != 'n')
+    if (c != 'Y' && c != 'y' && c != 'N' && c != 'n')
     {
-        while (c != 'N' || c != 'n' || c != 'Y' || c != 'y')
-        {
-            printf("Do you want to reduce noise of the image? [Y/N]:");
-            c = getchar();
-            printf("\n");
-        }
-        if (c == 'Y' || c == 'y')
-        {
-            //TODO : get angle function
-            double angle;
-            image = Deskew(image, angle);
-        }
+        Rot(image);
     }
 }
 
@@ -108,7 +76,7 @@ int main(int argc, char *argv[])
 {
     if (argc != 2)
     {
-        errx(1,"Use : ./kalytera <path of image>");
+        errx(1,"kalytera: Usage : ./kalytera <path of image>");
     }
 
     char *path = argv[1];
@@ -121,11 +89,19 @@ int main(int argc, char *argv[])
     image2binarized(image);
     display("tmp/binarized.png");
 
+    // Getting binarized image
+    path = "tmp/binarized.png";
+    image = load_img(path);
+
     // Noise reduction
     noisereduc(image);
-    display("tmp/noisereduction.png");
+    display("tmp/noisereduced.png");
 
-    //DeskewImage("tmp/noisereducted.png");
+    // Getting noise reduced image
+    path = "tmp/noisereduced.png";
+    image = load_img(path);
+
+    // Deskew
     Rot(image);
     display("tmp/deskew.png");
 

@@ -170,7 +170,7 @@ SDL_Surface *NoiseReduction(SDL_Surface *image)
 
 SDL_Surface *Reduct_noise(SDL_Surface *image)
 {
-    SDL_Surface *noisereducted = NoiseReduction(image);
-    IMG_SavePNG(noisereducted, "tmp/noisereducted.png");
-    return noisereducted;
+    SDL_Surface *noisereduced = NoiseReduction(image);
+    IMG_SavePNG(noisereduced, "tmp/noisereduced.png");
+    return noisereduced;
 }
