@@ -3,16 +3,16 @@
 // Ask the user to display an image in path
 void display(char *path)
 {
-    printf("Do you want to display the image? [Y/N]:");
+    printf("Do you want to display the image? [Y/N]: ");
     char c;
-    scanf("%c",&c);
-    printf("\n");
+    scanf(" %c",&c);
     if (c == 'Y' || c == 'y')
     {
         loader(path);
     }
     if (c != 'Y' && c != 'y' && c != 'N' && c != 'n')
     {
+        printf("Error : Please retry\n");
         display(path);
     }
 }
@@ -20,16 +20,16 @@ void display(char *path)
 // Ask user to binarize an image
 void image2binarized(SDL_Surface *image)
 {
-    printf("Do you want to binarize the image? [Y/N]:");
+    printf("Do you want to binarize the image? [Y/N]: ");
     char c;
-    scanf("%c",&c);
-    printf("\n");
+    scanf(" %c",&c);
     if (c == 'Y' || c == 'y')
     {
         image = Binarize(image);
     }
     if (c != 'Y' && c != 'y' && c != 'N' && c != 'n')
     {
+        printf("Error : Please retry\n");
         image2binarized(image);
     }
 }
@@ -37,16 +37,16 @@ void image2binarized(SDL_Surface *image)
 // Ask user to apply noise reduction on binarized SDL_Surface *
 void noisereduc(SDL_Surface *image)
 {
-    printf("Do you want to reduce noise of the image? [Y/N]:");
+    printf("Do you want to reduce noise of the image? [Y/N]: ");
     char c;
-    scanf("%c",&c);
-    printf("\n");
+    scanf(" %c",&c);
     if (c == 'Y' || c == 'y')
     {
         image = Reduct_noise(image);
     }
     if (c != 'Y' && c != 'y' && c != 'N' && c != 'n')
     {
+        printf("Error : Please retry\n");
         noisereduc(image);
     }
 }
@@ -54,20 +54,19 @@ void noisereduc(SDL_Surface *image)
 // Ask user to rotate a SDL_Surface *
 void Rot(SDL_Surface *image)
 {
-    printf("Do you want to rotate the image? [Y/N]:");
+    printf("Do you want to rotate the image? [Y/N]: ");
     char c;
-    scanf("%c",&c);
-    printf("\n");
+    scanf(" %c",&c);
     if (c == 'Y' || c == 'y')
     {
-        //TODO: get angle function
         printf("Enter the skew angle: ");
         double a;
-        scanf("%lf",&a);
+        scanf(" %lf",&a);
         image = Deskew(image, a);
     }
     if (c != 'Y' && c != 'y' && c != 'N' && c != 'n')
     {
+        printf("Error : Please retry\n");
         Rot(image);
     }
 }
