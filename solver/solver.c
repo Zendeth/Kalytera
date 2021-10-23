@@ -90,7 +90,7 @@ void square_to_line(int tamp[], int line, int col, int grid[][9])
     {
         for (j = col; j < col + 3; j++)
         {
-            tamp[++k] = grid[i][j];
+            tamp[k++] = grid[i][j];
         }
     }
 }

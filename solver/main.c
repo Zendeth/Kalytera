@@ -2,7 +2,6 @@
 
 int main(int argc, char *argv[])
 {
-    //Tests
     int grid[9][9];
     load_grid(argv[1], grid);
 
