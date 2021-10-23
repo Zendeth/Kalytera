@@ -3,8 +3,8 @@
 # Compilation and object files
 obj/
 bin/
-kalytera-ocr
-solver
+./kalytera-ocr
+./solver
 main
 *.o
 
