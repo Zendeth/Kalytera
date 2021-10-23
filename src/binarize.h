@@ -10,12 +10,19 @@
 
 #include <math.h>
 
-int Grayscale(char *file);
-SDL_Surface * Img_to_Grayscale(SDL_Surface *image);
+#include "pixel_operations.h"
+#include "loader.h"
 
-int Otsu(SDL_Surface *image);
-SDL_Surface * Grayscale_to_Binarization(SDL_Surface *image, int s);
+#define min(a,b) (((a)<(b))?(a):(b))
+#define max(a,b) (((a)>(b))?(a):(b))
 
-int Binarize(char *file);
+SDL_Surface *Img_to_Grayscale(SDL_Surface *image);
+
+int OtsuThreshold(SDL_Surface *image);
+SDL_Surface *OtsuBinarization(SDL_Surface *image);
+
+SDL_Surface *AdaptiveThresholdingBinarization(SDL_Surface *image, double k);
+
+SDL_Surface *Binarize(SDL_Surface *image, int k);
 
 #endif
