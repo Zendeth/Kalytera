@@ -25,7 +25,17 @@ void image2binarized(SDL_Surface *image)
     scanf(" %c",&c);
     if (c == 'Y' || c == 'y')
     {
-        image = Binarize(image);
+        printf("Is your image noisy? [Y/N]: ");
+        char n;
+        scanf(" %c",&n);
+        if (n == 'Y' || n == 'y')
+        {
+            image = Binarize(image,1);
+        }
+        else
+        {
+            image = Binarize(image,0);
+        }
     }
     if (c != 'Y' && c != 'y' && c != 'N' && c != 'n')
     {
