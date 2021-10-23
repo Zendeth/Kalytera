@@ -4,6 +4,7 @@
 obj/
 bin/
 kalytera
+solver
 main
 *.o
 

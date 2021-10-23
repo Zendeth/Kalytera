@@ -11,8 +11,13 @@ GTK=`pkg-config --cflags --libs gtk+-3.0` -export-dynamic
 
 all: build
 
-build: fix_libs setup_dirs pixel_operations preprocess binarize loader main
-	$(CC) $(CFLAGS) $(LDLIBS) $(GTK) bin/*.o -o kalytera
+build: kalytera-ocr kalytera-solver
+
+kalytera-ocr: setup pixel_operations preprocess binarize loader main-ocr
+	$(CC) $(CFLAGS) $(LDLIBS) $(GTK) bin/*.o -o kalytera-ocr
+
+kalytera-solver: setup
+	$(CC) $(CFLAGS) src/solver/*.c -o solver
 
 preprocess: deskew noisereduction
 
@@ -31,8 +36,10 @@ loader:
 pixel_operations:
 	$(CC) $(CFLAGS) $(LDLIBS) -o bin/pixel_operations.o -c src/pixel_operations.c
 
-main:
+main-ocr:
 	$(CC) $(CFLAGS) $(LDLIBS) $(GTK) -o bin/main.o -c src/main.c
+
+setup : fix_libs setup_dirs
 
 setup_dirs:
 	mkdir -p tmp
@@ -43,7 +50,8 @@ fix_libs:
 	export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/run/current-system/sw/lib/
 
 clean:
-	rm kalytera
+	rm kalytera-ocr
+	rm solver
 	rm -rf tmp
 	rm -rf bin
 	rm -rf output
