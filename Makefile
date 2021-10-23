@@ -1,11 +1,11 @@
 ################################################################################
-### 					Makefile for Kalytera project					 	 ###
-### 						Made by Hafid HOUSNI							 ###
+###                       Makefile for Kalytera project                      ###
+###                          Made by Hafid HOUSNI                            ###
 ################################################################################
 
 CC=gcc
 CFLAGS=-Wall -Wextra -std=c99 -O3 -g -D__NO_INLINE__
-LDLIBS=-lSDL2 -lSDL2_image -lm
+LDLIBS=-lSDL2 -lSDL2_image -lm `sdl2-config --cflags --libs`
 GTK=`pkg-config --cflags --libs gtk+-3.0` -export-dynamic
 
 
