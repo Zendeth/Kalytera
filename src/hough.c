@@ -7,8 +7,6 @@
 
 void drawLine(SDL_Surface *image, int x0, int y0, int x1, int y1, Uint32 pixel)
 {
-
-
     int w = image->w;
     int h = image->h;
     int dx = abs(x1 - x0);
@@ -45,13 +43,13 @@ void drawLine(SDL_Surface *image, int x0, int y0, int x1, int y1, Uint32 pixel)
 }
 
 
-void hough(SDL_Surface *image)
+void Hough(SDL_Surface *image)
 {
     double width = image->w;
     double height = image->h;
     double half_width = width / 2;
     double half_heigth = height / 2;
-    double count = 500;
+    double count = 200;
 
     double rho,theta;
 
@@ -60,14 +58,14 @@ void hough(SDL_Surface *image)
     double num_rhos = 2 * d + 1;
     double num_thetas = num_rhos;
     double dtheta = 180 / num_thetas;
-    double drhos = 180 / num_rhos;
+    double drhos = num_rhos / 180;
 
     int i;
-    int *thetas = malloc(sizeof(int*)*num_thetas+1);
-    int *rhos = malloc(sizeof(int*)*num_rhos+1);
+    double *thetas = malloc(sizeof(double)*num_thetas+1);
+    double *rhos = malloc(sizeof(double)*num_rhos+1);
 
-    for (i = 0; i <= num_thetas; i++)thetas[i] = i*dtheta;
-    for (i = 0; i <= num_rhos; i++) rhos[i] = i*drhos-d;
+    for (i = 0; i <= num_thetas; i++) thetas[i] = i*dtheta;
+    for (i = 0; i <= num_rhos; i++) {rhos[i] = i*drhos-d; printf("%lf\n",rhos[i]);}
 
     double *cos_thetas = malloc(sizeof(double) * (num_thetas + 1));
     double *sin_thetas = malloc(sizeof(double) * (num_thetas + 1));
@@ -109,31 +107,48 @@ void hough(SDL_Surface *image)
                     rho = (x * cos_thetas[t]) + (y * sin_thetas[t]);
                     int p = rho + d;
                     accu[p][t]++;
-                    //printf("%d\n",accu[p][t]);
                 }
             }
         }
     }
 
+    pixel = SDL_MapRGB(image->format,0,0,255);
+
+    drawLine(image,-600,0,-933,1000,pixel);
+
+    int prev = accu[0][0];
+    int t = 0, rr = 0;
+    int inc = 1;
+
     for (y = 0; y < num_rhos; y++)
     {
         for (x = 0; x < num_rhos; x++)
         {
-            //printf("%d\n",accu[x][y]);
-            if (accu[y][x] > count)
+            int val = accu[y][x];
+            if (val >= prev)
             {
-                rho = rhos[y];
-                theta = thetas[x];
-                double a = cos(theta);
-                double b = sin(theta);
-                int x0 = a * rho;
-                int y0 = b * rho;
-                int x1 = x0 + 1000 * (-b);
-                int y1 = y0 + 1000 * (a);
-                //printf("%d,%d|%d,%d\n",x1,y1,x2,y2);
-                pixel = (0x00 << 24) | (0x00 << 16) | (0xFF << 8) | 0xFF;
-                drawLine(image,0,0,0,0+x,pixel);
+                prev = val;
+                r = y;
+                t = x;
+                inc = 1;
+                continue;
             }
+            else if (val < prev && inc)
+                inc = 0;
+            if (val < count)
+                continue;
+            
+            rho = rhos[r];
+            theta = thetas[t];
+            double a = cos(theta);
+            double b = sin(theta);
+            int x0 = a * rho;
+            int y0 = b * rho;
+            int x1 = x0 + d * (-b);
+            int y1 = y0 + d * (a);
+            int x2 = x0 - d * (-b);
+            int y2 = y0 - d * (a);
+            drawLine(image,x1,y1,x2,y2,pixel);
         }
     }
 
