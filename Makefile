@@ -13,11 +13,14 @@ all: build
 
 build: kalytera-ocr kalytera-solver
 
-kalytera-ocr: setup pixel_operations preprocess binarize loader main-ocr
+kalytera-ocr: setup pixel_operations sobel preprocess binarize loader main-ocr
 	$(CC) $(CFLAGS) $(LDLIBS) $(GTK) bin/*.o -o kalytera-ocr
 
 kalytera-solver: setup
 	$(CC) $(CFLAGS) src/solver/*.c -o solver
+
+sobel:
+	$(CC) $(CFLAGS) $(LDLIBS) -o bin/sobel.o -c src/sobel.c
 
 preprocess: deskew noisereduction
 

@@ -81,6 +81,23 @@ void Rot(SDL_Surface *image)
     }
 }
 
+// Ask user for sobel
+void Sobl(SDL_Surface *image)
+{
+    printf("Do you want to detect the edges using Sobel? [Y/N]: ");
+    char c;
+    scanf(" %c",&c);
+    if (c == 'Y' || c == 'y')
+    {
+        image = SobelMain(image);
+    }
+    if (c != 'Y' && c != 'y' && c != 'N' && c != 'n')
+    {
+        printf("Error : Please retry\n");
+        Sobl(image);
+    }
+}
+
 int main(int argc, char *argv[])
 {
     if (argc != 2)
@@ -95,24 +112,52 @@ int main(int argc, char *argv[])
     SDL_Surface *image = load_img(path);
 
     // Binarize
+    remove("tmp/binarized.png");
     image2binarized(image);
-    display("tmp/binarized.png");
+    if(!access("tmp/binarized.png", F_OK ))
+    {
+        display("tmp/binarized.png");
 
-    // Getting binarized image
-    path = "tmp/binarized.png";
-    image = load_img(path);
+        // Getting binarized image
+        path = "tmp/binarized.png";
+        image = load_img(path);
+    }
 
     // Noise reduction
+    remove("tmp/noisereducted.png");
     noisereduc(image);
-    display("tmp/noisereduced.png");
+    if(!access("tmp/noisereduced.png", F_OK ))
+    {
+        display("tmp/noisereduced.png");
 
-    // Getting noise reduced image
-    path = "tmp/noisereduced.png";
-    image = load_img(path);
+        // Getting noise reduced image
+        path = "tmp/noisereduced.png";
+        image = load_img(path);
+    }
 
     // Deskew
+    remove("tmp/deskew.png");
     Rot(image);
-    display("tmp/deskew.png");
+    if(!access("tmp/deskew.png", F_OK ))
+    {
+        display("tmp/deskew.png");
+
+        // Getting deskewed image
+        path = "tmp/deskew.png";
+        image = load_img(path);
+    }
+
+    // Sobel
+    remove("tmp/sobel.png");
+    Sobl(image);
+    if(!access("tmp/sobel.png", F_OK ))
+    {
+        display("tmp/sobel.png");
+
+        // Getting sobel-applied image
+        path = "tmp/sobel.png";
+        image = load_img(path);
+    }
 
     return EXIT_SUCCESS;
 }
