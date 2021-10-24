@@ -100,7 +100,7 @@ void Sobl(SDL_Surface *image)
 
 int main(int argc, char *argv[])
 {
-    if (argc != 2)
+    /*if (argc != 2)
     {
         errx(1,"kalytera: Usage : ./kalytera <path of image>");
     }
@@ -138,14 +138,16 @@ int main(int argc, char *argv[])
     // Deskew
     remove("tmp/deskew.png");
     Rot(image);
-    if(!access("tmp/deskew.png", F_OK ))
-    {
-        display("tmp/deskew.png");
+    
+    display("tmp/deskew.png");*/
 
-        // Getting deskewed image
-        path = "tmp/deskew.png";
-        image = load_img(path);
-    }
+    char *path = argv[1];
+    SDL_Surface *image = load_img(path);
+    image = Binarize(image,0);
+
+    hough(image);
+
+    IMG_SavePNG(image, "tmp/hough.png");
 
     // Sobel
     remove("tmp/sobel.png");
