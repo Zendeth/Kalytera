@@ -11,7 +11,7 @@ GTK=`pkg-config --cflags --libs gtk+-3.0` -export-dynamic
 
 all: build
 
-build: kalytera-ocr kalytera-solver
+build: kalytera-ocr kalytera-solver kalytera-XOR
 
 kalytera-ocr: setup pixel_operations sobel preprocess binarize loader main-ocr
 	$(CC) $(CFLAGS) $(LDLIBS) $(GTK) bin/*.o -o kalytera-ocr
@@ -19,6 +19,9 @@ kalytera-ocr: setup pixel_operations sobel preprocess binarize loader main-ocr
 kalytera-solver: setup
 	$(CC) $(CFLAGS) src/solver/*.c -o solver
 
+Kalytera-XOR : setup
+	$(CC) $(CFLAGS) src/XOR/*.c -o xor
+	
 sobel:
 	$(CC) $(CFLAGS) $(LDLIBS) -o bin/sobel.o -c src/sobel.c
 
