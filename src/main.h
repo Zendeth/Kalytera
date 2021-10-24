@@ -10,6 +10,7 @@
 #include "binarize.h"
 #include "noisereduction.h"
 #include "deskew.h"
+#include "hough.h"
 
 void display(char *path);
 void image2binarized(SDL_Surface *image);

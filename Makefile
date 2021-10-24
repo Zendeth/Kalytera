@@ -5,14 +5,15 @@
 
 CC=gcc
 CFLAGS=-Wall -Wextra -std=c99 -O3 -g -D__NO_INLINE__
-LDLIBS=-lSDL2 -lSDL2_image -lm `sdl2-config --cflags --libs` -lm
+LDLIBS=-lSDL2 -lSDL2_image -lm
+LDFLAGS = -fsanitize=address
 GTK=`pkg-config --cflags --libs gtk+-3.0` -export-dynamic
 
 
 all: build
 
-build: fix_libs setup_dirs pixel_operations preprocess binarize loader main
-	$(CC) $(CFLAGS) $(LDLIBS) $(GTK) bin/*.o -o kalytera
+build: fix_libs setup_dirs pixel_operations preprocess binarize loader main hough
+	$(CC) $(CFLAGS) $(GTK)  bin/*.o $(LDLIBS) -o kalytera
 
 preprocess: deskew noisereduction
 
@@ -33,6 +34,9 @@ pixel_operations:
 
 main:
 	$(CC) $(CFLAGS) $(LDLIBS) $(GTK) -o bin/main.o -c src/main.c
+
+hough:
+	$(CC) $(CFLAGS) $(LDLIBS) $(GTK) -o bin/hough.o -c src/hough.c
 
 setup_dirs:
 	mkdir -p tmp

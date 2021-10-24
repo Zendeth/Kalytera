@@ -83,7 +83,7 @@ void Rot(SDL_Surface *image)
 
 int main(int argc, char *argv[])
 {
-    if (argc != 2)
+    /*if (argc != 2)
     {
         errx(1,"kalytera: Usage : ./kalytera <path of image>");
     }
@@ -112,7 +112,15 @@ int main(int argc, char *argv[])
 
     // Deskew
     Rot(image);
-    display("tmp/deskew.png");
+    display("tmp/deskew.png");*/
+
+    char *path = argv[1];
+    SDL_Surface *image = load_img(path);
+    image = Binarize(image,0);
+
+    hough(image);
+
+    IMG_SavePNG(image, "tmp/hough.png");
 
     return EXIT_SUCCESS;
 }
