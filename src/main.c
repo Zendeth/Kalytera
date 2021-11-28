@@ -154,7 +154,7 @@ int main(int argc, char *argv[])
     }
     
     // Hough test (by David)
-    hough(image);
+    Hough(image);
     IMG_SavePNG(image, "tmp/hough.png");
 
     return EXIT_SUCCESS;
