@@ -100,7 +100,7 @@ void Sobl(SDL_Surface *image)
 
 int main(int argc, char *argv[])
 {
-    /*if (argc != 2)
+    if (argc != 2)
     {
         errx(1,"kalytera: Usage : ./kalytera <path of image>");
     }
@@ -139,15 +139,7 @@ int main(int argc, char *argv[])
     remove("tmp/deskew.png");
     Rot(image);
     
-    display("tmp/deskew.png");*/
-
-    char *path = argv[1];
-    SDL_Surface *image = load_img(path);
-    image = Binarize(image,0);
-
-    hough(image);
-
-    IMG_SavePNG(image, "tmp/hough.png");
+    display("tmp/deskew.png");
 
     // Sobel
     remove("tmp/sobel.png");
@@ -160,6 +152,10 @@ int main(int argc, char *argv[])
         path = "tmp/sobel.png";
         image = load_img(path);
     }
+    
+    // Hough test (by David)
+    hough(image);
+    IMG_SavePNG(image, "tmp/hough.png");
 
     return EXIT_SUCCESS;
 }
