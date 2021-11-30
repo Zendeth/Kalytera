@@ -47,6 +47,81 @@ void Hough(SDL_Surface *image)
 {
     double width = image->w;
     double height = image->h;
+    double diagonal = sqrt(width*width + height*height);
+
+    int thetaDeg;
+    float rho;
+    int x,y;
+    Uint32 pixel;
+    Uint8 r, g, b;
+
+    int *accu = malloc((180 * diagonal) * sizeof(int));
+    for (int i = 0; i < diagonal * 180; i++)
+    {
+        accu[i] = 0;
+    }
+
+    for (x = 0; x < width; x++)
+    {
+        for (y = 0; y < height; y++)
+        {
+            pixel = get_pixel(image, x, y);
+            r = pixel >> 16 & 0xFF;
+            g = pixel >> 8 & 0xFF;
+            b = pixel & 0xFF;
+            int pixel_value = (r+g+b)/3;
+                  
+            if (pixel_value > 0)
+            {
+                for(thetaDeg = 0; thetaDeg < 180; thetaDeg++)
+                {
+                    float thetaRad = degToRad(thetaDeg);
+                    rho = x*cosf(thetaRad) + y * sinf(thetaRad);
+                    accu[(int)rho + thetaDeg]++;
+                }
+            }
+        }
+    }
+
+    int prev = accu[0];
+    int inc = 1;
+
+    double count = 1000;
+
+    for (rho = 0; rho < diagonal; rho++)
+    {
+        for (thetaDeg = 0; thetaDeg < 180; thetaDeg++)
+        {
+            int val = accu[(int)rho * thetaDeg];
+            if (val > count)
+            {
+                if (val > prev)
+                {
+                    prev = val;
+                    inc = 1;
+                    continue;
+                }
+                else if (val < prev && inc)
+                    inc = 0;
+
+                for(x = 0; x < width; x++)
+                {
+                    y = (int)(rho - x * cosf(degToRad(thetaDeg))/sinf(degToRad(thetaDeg)));
+                    if (y<0) y = 0;
+                    if (y>height) y = height;
+                    //printf("%d,%d\n",x,y);
+                    put_pixel(image,x,y,pixel);
+                }
+            }
+        }
+    }
+    free(accu);
+}
+
+/*void Hough(SDL_Surface *image)
+{
+    double width = image->w;
+    double height = image->h;
     double half_width = width / 2;
     double half_heigth = height / 2;
     double count = 200;
@@ -65,7 +140,7 @@ void Hough(SDL_Surface *image)
     double *rhos = malloc(sizeof(double)*num_rhos+1);
 
     for (i = 0; i <= num_thetas; i++) thetas[i] = i*dtheta;
-    for (i = 0; i <= num_rhos; i++) {rhos[i] = i*drhos-d; printf("%lf\n",rhos[i]);}
+    for (i = 0; i <= num_rhos; i++) rhos[i] = i*drhos-d;
 
     double *cos_thetas = malloc(sizeof(double) * (num_thetas + 1));
     double *sin_thetas = malloc(sizeof(double) * (num_thetas + 1));
@@ -114,7 +189,7 @@ void Hough(SDL_Surface *image)
 
     pixel = SDL_MapRGB(image->format,0,0,255);
 
-    drawLine(image,-600,0,-933,1000,pixel);
+    //drawLine(image,-600,0,-933,1000,pixel);
 
     int prev = accu[0][0];
     int t = 0, rr = 0;
@@ -128,7 +203,7 @@ void Hough(SDL_Surface *image)
             if (val >= prev)
             {
                 prev = val;
-                r = y;
+                rr = y;
                 t = x;
                 inc = 1;
                 continue;
@@ -138,7 +213,7 @@ void Hough(SDL_Surface *image)
             if (val < count)
                 continue;
             
-            rho = rhos[r];
+            rho = rhos[rr];
             theta = thetas[t];
             double a = cos(theta);
             double b = sin(theta);
@@ -161,4 +236,4 @@ void Hough(SDL_Surface *image)
     free(thetas);
     free(cos_thetas);
     free(sin_thetas);
-}
+}*/

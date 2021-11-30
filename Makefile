@@ -15,13 +15,13 @@ all: build
 build: kalytera-ocr kalytera-solver Kalytera-XOR
 
 kalytera-ocr: setup pixel_operations sobel preprocess binarize loader hough main-ocr
-	$(CC) $(CFLAGS) $(GTK) bin/*.o $(LDLIBS) -o kalytera-ocr
+	$(CC) $(CFLAGS) $(GTK) bin/*.o $(LDLIBS) $(LDFLAGS) -o kalytera-ocr
 
 kalytera-solver: setup
 	$(CC) $(CFLAGS) src/solver/*.c -o solver
 	
 Kalytera-XOR : setup
-	$(CC) $(CFLAGS) src/XOR/*.c -o xor
+	$(CC) $(CFLAGS) XOR/*.c -o xor
 
 sobel:
 	$(CC) $(CFLAGS) $(LDLIBS) -o bin/sobel.o -c src/sobel.c

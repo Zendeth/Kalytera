@@ -1,6 +1,7 @@
 #include <time.h>
 #include <math.h>
 #include <fcntl.h>
+#include "xor.h"
 
 #define NUMPAT 4
 #define NUMIN  2
