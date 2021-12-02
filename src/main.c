@@ -69,10 +69,13 @@ void Rot(SDL_Surface *image)
     scanf(" %c",&c);
     if (c == 'Y' || c == 'y')
     {
-        printf("Enter the skew angle: ");
+        printf("Enter the skew angle (enter . for auto): ");
         double a;
         scanf(" %lf",&a);
-        image = Deskew(image, a);
+        if (a == 0.0)
+            image = AutoRotate(image);
+        else
+            image = ManualRotate(image, a);
     }
     if (c != 'Y' && c != 'y' && c != 'N' && c != 'n')
     {

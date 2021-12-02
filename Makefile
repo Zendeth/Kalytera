@@ -61,8 +61,8 @@ fix_libs:
 	export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/run/current-system/sw/lib/
 
 clean:
-	rm kalytera-ocr
-	rm solver
+	rm -f kalytera-ocr
+	rm -f solver
 	rm -rf tmp
 	rm -rf bin
 	rm -rf output
