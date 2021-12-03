@@ -4,50 +4,253 @@
 
 #define degToRad(angleInDegrees) ((angleInDegrees) * M_PI / 180.0)
 #define radToDeg(angleInRadians) ((angleInRadians) * 180.0 / M_PI)
+#define COUNT 300
+#define MARGIN 5
+#define SQUARE_MARGIN 10
+#define THETAS 91
+#define HOUGH_MARGIN 2
 
-void drawLine(SDL_Surface *image, int x0, int y0, int x1, int y1, Uint32 pixel)
+void drawHough (int *accu, SDL_Surface *image)
 {
-    int w = image->w;
-    int h = image->h;
-    int dx = abs(x1 - x0);
-    int sx = x0 < x1 ? 1 : -1;
-    int dy = -abs(y1 - y0);
-    int sy = y0 < y1 ? 1 : -1;
+    double width = image->w;
+    double height = image->h;
+    int rhos = sqrt(width*width + height*height);
+    int thetaDeg;
+    float rho;
+    int x,y;
+    Uint32 pixel = SDL_MapRGB(image->format,255,0,0);
 
-    int err = dx + dy;
-
-    while (1)
+    for (rho = 0; rho < rhos; rho++)
     {
-        
-        if (0 <= x0 && x0 < w && 0 <= y0 && y0 < h)
+        for (thetaDeg = 0; thetaDeg <= THETAS; thetaDeg++)
         {
-            put_pixel(image,x0,y0,pixel);
-        }
-
-        if (x0 == x1 && y0 == y1)
-            break;
-
-        int e2 = 2 * err;
-
-        if (e2 >= dy)
-        {
-            err += dy;
-            x0 += sx;
-        }
-        if (e2 <= dx)
-        {
-            err += dx;
-            y0 += sy;
+            int val = accu[(int)rho + thetaDeg * rhos];
+            if (val > COUNT)
+            {
+                for(x = 0; x < width; x++)
+                {
+                    y = (int)(rho - x * cosf(degToRad(thetaDeg))/sinf(degToRad(thetaDeg)));
+                    if (y<0) y = 0;
+                    else if (y>height) y = height;
+                    put_pixel(image,x,y,pixel);
+                }
+                if (thetaDeg == 0)
+                {
+                    for(y = 0; y < height; y++)
+                    {
+                        x = (int)(rho - y * sinf(degToRad(thetaDeg))/cosf(degToRad(thetaDeg)));
+                        if (x<0) x = 0;
+                        else if (x>width) x = width;
+                        put_pixel(image,x,y,pixel);
+                    }
+                }
+            }
         }
     }
 }
 
+int parametricIntersect(float r1, int t1, float r2, int t2, int *x, int *y)
+{
+    float ct1=cosf(degToRad(t1));
+    float st1=sinf(degToRad(t1));
+    float ct2=cosf(degToRad(t2));
+    float st2=sinf(degToRad(t2));
+    float d=ct1*st2-st1*ct2;
+    if(d!=0.0f)
+    {   
+        *x=(int)((st2*r1-st1*r2)/d);
+        *y=(int)((-ct2*r1+ct1*r2)/d);
+        return(1);
+    }
+    else 
+    {
+        return(0);
+    }
+}
+
+void detectAngle(SDL_Surface *image, int *accu, int *intersectList)
+{
+    int width = image->w;
+    int height = image->h;
+    int rhos = sqrt(width*width + height*height);
+    int t1,t2;
+    float r1,r2;
+    int x,y;
+
+    for (r1 = 0; r1 < rhos; r1++)
+    {
+        for (t1 = 0; t1 < THETAS; t1++)
+        {
+            int val = accu[(int)r1 + t1 * rhos];
+            if (val > COUNT)
+            {
+                for (r2 = 0; r2 < rhos; r2++)
+                {
+                    for (t2 = 0; t2 < THETAS; t2++)
+                    {
+                        int val = accu[(int)r2 + t2 * rhos];
+                        if (val > COUNT && t1 != t2 && parametricIntersect(r1, t1, r2, t2, &x, &y))
+                        {
+                            if(x >= 0 && y >= 0 && x < width && y < height)
+                            {
+                                intersectList[x + y * width] = 1;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+void drawIntersect(SDL_Surface *image, int *intersectList)
+{
+    int width = image->w;
+    int height = image->h;
+    int x,y;
+
+
+    Uint32 pixel = SDL_MapRGB(image->format,0,255,0);
+
+    for (x = 0; x < width; x++)
+    {
+        for (y = 0; y < height; y++)
+        {
+            if (intersectList[x + y * width] == 1)
+            {
+                for (int i = 0; i < 3; i++)
+                {
+                    for (int j = 0; j < 3; j++)
+                    {
+                        if (x+i < width && y+i < height)
+                        {
+                            put_pixel(image,x+i,y+j,pixel);
+                        }
+                        else
+                        {
+                            put_pixel(image,x,y,pixel);
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+void recDetectLargestSquare(SDL_Surface *image, int *intersectList, int x1, int y1, int *x, int  *y, int *side)
+{
+    int width = image->w;
+    int height = image->h;
+    int sideX, sideY;
+
+    for (int x2 = x1 + 1; x2 < width; x2++)
+    {
+        for (int y2 = x1 + 1; y2 < height; y2++)
+        {
+            for (int i = -MARGIN; i < MARGIN; i++)
+            {
+                if (y1 + i >= 0 && y1 + i < height && intersectList[x2 + (y1+i) * width] == 1)
+                {
+                    sideX = abs(x2-x1);
+                    //printf("(%d,%d):%d",x2,*x,sideX);
+                
+                    for (int i = -MARGIN; i < MARGIN; i++)
+                    {
+                        if (x1 + i >= 0 && x1 + i < width && intersectList[(x1+i) + y2 * width] == 1)
+                        {
+                            sideY = abs(y2-y1);
+                        }
+                        //printf("%d,%d\n",sideX,sideY);
+                        if (sideX > sideY - SQUARE_MARGIN && sideX < sideY + SQUARE_MARGIN && sideX > *side)
+                        {
+                            *side = sideX;
+                            *x = x1;
+                            *y = y1;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+void detectLargestSquare(SDL_Surface *image, int *intersectList, int *x, int  *y, int *side)
+{
+    int width = image->w;
+    int height = image->h;
+    for (int i = 0; i < width; i++)
+    {
+        for (int j = 0; j < height; j++)
+        {
+            if (intersectList[i + j * width] == 1)
+            {
+                recDetectLargestSquare(image,intersectList,i,j,x,y,side);
+            }
+        }
+    }
+}
+
+void drawLargestSquare(SDL_Surface *image, int *intersectList)
+{
+    int x = 0;
+    int y = 0;
+    int side = 0;
+
+    detectLargestSquare(image,intersectList,&x,&y,&side);
+    printf("%d,%d:%d\n",x,y,side);
+
+    Uint32 pixel = SDL_MapRGB(image->format,255,0,0);
+
+    for (int i = x; i < x + side; i++)
+    {
+        put_pixel(image,i,y,pixel);
+        put_pixel(image,i,y+side,pixel);
+    }
+
+    for (int i = y; i < y + side; i++)
+    {
+        put_pixel(image,x,i,pixel);
+        put_pixel(image,x+side,i,pixel);
+    }
+}
+
+void cutImage(SDL_Surface *image, int *intersectList)
+{
+    int x = 0;
+    int y = 0;
+    int side = 0;
+
+    detectLargestSquare(image,intersectList,&x,&y,&side);
+
+    int size = side/9;
+
+    printf("yeeessssss");
+
+    for (int i = 0; i < 9; i++)
+    {
+        for (int j = 0; j < 9; j++)
+        {
+            SDL_Surface *number = SDL_CreateRGBSurface(0,size,size,32,0,0,0,0);
+            for (int k = 0; k < size; k++)
+            {
+                for (int l = 0; l < size; l++)
+                {
+                    Uint32 pixel = get_pixel(image,x + (i * size) + k, y + (j * size) + l);
+                    put_pixel(number,k,l,pixel);
+                }
+            }
+            char path[100];
+            snprintf(path,sizeof(path), "tmp/number_%d%d.png",i,j);
+            IMG_SavePNG(number,path);
+        }
+    }
+}
 
 void Hough(SDL_Surface *image)
 {
-    double width = image->w;
-    double height = image->h;
-    double diagonal = sqrt(width*width + height*height);
+    int width = image->w;
+    int height = image->h;
+    int rhos = sqrt(width*width + height*height);
 
     int thetaDeg;
     float rho;
@@ -55,11 +258,9 @@ void Hough(SDL_Surface *image)
     Uint32 pixel;
     Uint8 r, g, b;
 
-    int *accu = malloc((180 * diagonal) * sizeof(int));
-    for (int i = 0; i < diagonal * 180; i++)
-    {
-        accu[i] = 0;
-    }
+    int *accu = calloc(rhos*THETAS,sizeof(int));
+    
+    int *intersectList = calloc(width*height,sizeof(int));
 
     for (x = 0; x < width; x++)
     {
@@ -69,171 +270,74 @@ void Hough(SDL_Surface *image)
             r = pixel >> 16 & 0xFF;
             g = pixel >> 8 & 0xFF;
             b = pixel & 0xFF;
-            int pixel_value = (r+g+b)/3;
+            int pixel_value = (r+g+b);
                   
-            if (pixel_value > 0)
+            if (pixel_value == 765)
             {
-                for(thetaDeg = 0; thetaDeg < 180; thetaDeg++)
+                for(thetaDeg = 0; thetaDeg <= THETAS; thetaDeg++)
                 {
                     float thetaRad = degToRad(thetaDeg);
-                    rho = x*cosf(thetaRad) + y * sinf(thetaRad);
-                    accu[(int)rho + thetaDeg]++;
+                    rho = x * cosf(thetaRad) + y * sinf(thetaRad);
+                    accu[(int)rho + thetaDeg * rhos]++;
                 }
             }
         }
     }
 
-    int prev = accu[0];
-    int inc = 1;
-
-    double count = 1000;
-
-    for (rho = 0; rho < diagonal; rho++)
+    /*for (int rho = HOUGH_MARGIN; rho < rhos-HOUGH_MARGIN; rho++)
     {
-        for (thetaDeg = 0; thetaDeg < 180; thetaDeg++)
+        for (int theta = HOUGH_MARGIN; theta < THETAS-HOUGH; theta++)
         {
-            int val = accu[(int)rho * thetaDeg];
-            if (val > count)
+            int sum = 0;
+            int i = -HOUGH_MARGIN;
+            int  j = -HOUGH_MARGIN;
+            short check = 1;
+            int val = accu[rhos + i + (theta + j) * rhos];
+            /*while(check && i < 2)
             {
-                if (val > prev)
+                while(check && j < 2)
                 {
-                    prev = val;
-                    inc = 1;
-                    continue;
+                    int val = accu[rhos + i + (theta + j) * rhos];
+                    if(val > COUNT)
+                    {
+                        sum += val;
+                    }
+                    else
+                        check = 0;
+                    j++;
                 }
-                else if (val < prev && inc)
-                    inc = 0;
-
-                for(x = 0; x < width; x++)
-                {
-                    y = (int)(rho - x * cosf(degToRad(thetaDeg))/sinf(degToRad(thetaDeg)));
-                    if (y<0) y = 0;
-                    if (y>height) y = height;
-                    //printf("%d,%d\n",x,y);
-                    put_pixel(image,x,y,pixel);
-                }
+                i++;
             }
-        }
-    }
-    free(accu);
-}
-
-/*void Hough(SDL_Surface *image)
-{
-    double width = image->w;
-    double height = image->h;
-    double half_width = width / 2;
-    double half_heigth = height / 2;
-    double count = 200;
-
-    double rho,theta;
-
-    double d = sqrt(width * width + height * height);
-
-    double num_rhos = 2 * d + 1;
-    double num_thetas = num_rhos;
-    double dtheta = 180 / num_thetas;
-    double drhos = num_rhos / 180;
-
-    int i;
-    double *thetas = malloc(sizeof(double)*num_thetas+1);
-    double *rhos = malloc(sizeof(double)*num_rhos+1);
-
-    for (i = 0; i <= num_thetas; i++) thetas[i] = i*dtheta;
-    for (i = 0; i <= num_rhos; i++) rhos[i] = i*drhos-d;
-
-    double *cos_thetas = malloc(sizeof(double) * (num_thetas + 1));
-    double *sin_thetas = malloc(sizeof(double) * (num_thetas + 1));
-    for (int i = 0; i <= num_thetas; i++)
-    {
-        thetas[i] = degToRad(thetas[i]);
-        cos_thetas[i] = cos(thetas[i]);
-        sin_thetas[i] = sin(thetas[i]);
-    }
-
-    int **accu = malloc(sizeof(int*)*num_rhos);
-    for (i = 0; i < num_rhos; i++) 
-    {
-        accu[i] = malloc(sizeof(int)*num_thetas);
-        for (int j = 0; j < num_thetas; j++)
-        {
-            accu[i][j] = 0;
-        }
-    }
-
-    Uint32 pixel;
-    Uint8 r, g, b;
-    int x,y;
-
-    for (x = 0; x < width; x++)
-    {
-        for (y = 0; y < height; y++)
-        {
-            pixel = get_pixel(image, x, y);
-            r = pixel >> 16 & 0xFF;
-            g = pixel >> 8 & 0xFF;
-            b = pixel & 0xFF;
-            int pixel_value = (r+g+b)/3;
-                  
-            if (pixel_value == 255)
-            {
-                for (int t = 0; t < num_thetas; t++)
-                {
-                    rho = (x * cos_thetas[t]) + (y * sin_thetas[t]);
-                    int p = rho + d;
-                    accu[p][t]++;
-                }
-            }
-        }
-    }
-
-    pixel = SDL_MapRGB(image->format,0,0,255);
-
-    //drawLine(image,-600,0,-933,1000,pixel);
-
-    int prev = accu[0][0];
-    int t = 0, rr = 0;
-    int inc = 1;
-
-    for (y = 0; y < num_rhos; y++)
-    {
-        for (x = 0; x < num_rhos; x++)
-        {
-            int val = accu[y][x];
-            if (val >= prev)
-            {
-                prev = val;
-                rr = y;
-                t = x;
-                inc = 1;
-                continue;
-            }
-            else if (val < prev && inc)
-                inc = 0;
-            if (val < count)
-                continue;
             
-            rho = rhos[rr];
-            theta = thetas[t];
-            double a = cos(theta);
-            double b = sin(theta);
-            int x0 = a * rho;
-            int y0 = b * rho;
-            int x1 = x0 + d * (-b);
-            int y1 = y0 + d * (a);
-            int x2 = x0 - d * (-b);
-            int y2 = y0 - d * (a);
-            drawLine(image,x1,y1,x2,y2,pixel);
+            if (val > COUNT)
+            {
+                while(i < HOUGH_MARGIN+1)
+                {
+                    while(j < HOUGH_MARGIN+1)
+                    {
+                        accu[rho + i + (theta + j) * rhos] = 0;
+                        j++;
+                    }
+                    i++;
+                }
+                /*accu[rho + 1 + (theta+1) * rhos] = 0;
+                accu[rho + 1 + theta * rhos] = 0;
+                accu[rho + 1 + (theta-1) * rhos] = 0;
+                accu[rho + (theta+1) * rhos] = 0;
+                accu[rho + (theta-1) * rhos] = 0;
+                accu[rho - 1 + (theta+1) * rhos] = 0;
+                accu[rho - 1 + theta * rhos] = 0;
+                accu[rho - 1 + (theta-1) * rhos] = 0;
+            }
         }
-    }
+    }*/
 
-    for (y = 0; y < num_rhos; y++)
-    {
-        free(accu[y]);
-    }
+    //drawHough(accu,image);
+    detectAngle(image,accu,intersectList);
+    //drawIntersect(image,intersectList);
+    drawLargestSquare(image,intersectList);
+    //cutImage(image,intersectList);
+
     free(accu);
-    free(rhos);
-    free(thetas);
-    free(cos_thetas);
-    free(sin_thetas);
-}*/
+    free(intersectList);
+}

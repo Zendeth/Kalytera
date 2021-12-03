@@ -111,7 +111,7 @@ int main(int argc, char *argv[])
 
     SDL_Surface *image = load_img(path);
 
-    /*// Binarize
+    // Binarize
     remove("tmp/binarized.png");
     image2binarized(image);
     if(!access("tmp/binarized.png", F_OK ))
@@ -151,7 +151,7 @@ int main(int argc, char *argv[])
         // Getting sobel-applied image
         path = "tmp/sobel.png";
         image = load_img(path);
-    }*/
+    }
     
     // Hough test (by David)
     Hough(image);
