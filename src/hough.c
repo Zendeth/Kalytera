@@ -6,15 +6,15 @@
 #define radToDeg(angleInRadians) ((angleInRadians) * 180.0 / M_PI)
 #define COUNT 300
 #define MARGIN 5
-#define SIDE_MARGIN 7
+#define SIDE_MARGIN 5
 #define THETAS 91
 #define HOUGH_MARGIN 2
 #define SQUARE_MARGIN 0
 
 void drawHough (int *accu, SDL_Surface *image)
 {
-    double width = image->w;
-    double height = image->h;
+    int width = image->w;
+    int height = image->h;
     int rhos = sqrt(width*width + height*height);
     int thetaDeg;
     float rho;
@@ -23,7 +23,7 @@ void drawHough (int *accu, SDL_Surface *image)
 
     for (rho = 0; rho < rhos; rho++)
     {
-        for (thetaDeg = 0; thetaDeg <= THETAS; thetaDeg++)
+        for (thetaDeg = 0; thetaDeg < THETAS; thetaDeg++)
         {
             int val = accu[(int)rho + thetaDeg * rhos];
             if (val > COUNT)
@@ -275,7 +275,7 @@ SDL_Surface *hough(SDL_Surface *image)
                   
             if (pixel_value == 765)
             {
-                for(thetaDeg = 0; thetaDeg <= THETAS; thetaDeg++)
+                for(thetaDeg = 0; thetaDeg < THETAS; thetaDeg++)
                 {
                     float thetaRad = degToRad(thetaDeg);
                     rho = x * cosf(thetaRad) + y * sinf(thetaRad);
