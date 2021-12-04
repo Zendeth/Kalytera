@@ -117,7 +117,7 @@ void Hough(SDL_Surface *image)
     }
 }
 
-int main1(int argc, char *argv[])
+int main(int argc, char *argv[])
 {
     if (argc != 2)
     {
@@ -157,8 +157,14 @@ int main1(int argc, char *argv[])
     // Deskew
     remove("tmp/deskew.png");
     Rot(image);
-    
-    display("tmp/deskew.png");
+    if(!access("tmp/deskew.png", F_OK ))
+    {
+        display("tmp/deskew.png");
+
+        // Getting noise reduced image
+        path = "tmp/deskew.png";
+        image = load_img(path);
+    }
 
     // Sobel
     remove("tmp/sobel.png");
@@ -190,8 +196,8 @@ int main1(int argc, char *argv[])
     return EXIT_SUCCESS;
 }
 
-int main(int argc, char *argv[])
+/*int main(int argc, char *argv[])
 {
     int i = launch_gui();
     return i;
-}
+}*/

@@ -13,7 +13,7 @@ all: build
 
 build: kalytera-ocr kalytera-solver Kalytera-XOR
 
-kalytera-ocr: setup pixel_operations sobel preprocess binarize loader grid hough main-ocr
+kalytera-ocr: setup pixel_operations sobel preprocess binarize loader grid hough main
 	$(CC) $(CFLAGS) $(GTK) bin/*.o $(LDLIBS) -o kalytera-ocr
 
 kalytera-solver: setup
@@ -47,6 +47,9 @@ pixel_operations:
 
 main-ocr:
 	$(CC) $(CFLAGS) $(LDLIBS) $(GTK) -o bin/gui.o -c src/gui.c
+	$(CC) $(CFLAGS) $(LDLIBS) $(GTK) -o bin/main.o -c src/main.c
+
+main:
 	$(CC) $(CFLAGS) $(LDLIBS) $(GTK) -o bin/main.o -c src/main.c
 
 hough:

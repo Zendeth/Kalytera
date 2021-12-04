@@ -4,12 +4,12 @@
 
 #define degToRad(angleInDegrees) ((angleInDegrees) * M_PI / 180.0)
 #define radToDeg(angleInRadians) ((angleInRadians) * 180.0 / M_PI)
-#define COUNT 300
-#define MARGIN 5
-#define SIDE_MARGIN 5
-#define THETAS 91
-#define HOUGH_MARGIN 2
-#define SQUARE_MARGIN 0
+#define COUNT 310 //thereshold of the hough transformation
+#define MARGIN 5 //number of line and colomn checked for when looking for a square at a pos
+#define SIDE_MARGIN 2 //margin of error for deciding if the shape is a rectangle or a square
+#define THETAS 91 //from 0 to THETAS angles check for Hough
+#define HOUGH_MARGIN 5 //distance too look around a pos in the accu in order to reduce the number of line
+#define SQUARE_MARGIN 10 //margin of error to decide if a square is bigger than the previous
 
 void drawHough (int *accu, SDL_Surface *image)
 {
@@ -273,7 +273,7 @@ SDL_Surface *hough(SDL_Surface *image)
             b = pixel & 0xFF;
             int pixel_value = (r+g+b);
                   
-            if (pixel_value == 765)
+            if (pixel_value > 0)
             {
                 for(thetaDeg = 0; thetaDeg < THETAS; thetaDeg++)
                 {
@@ -291,7 +291,7 @@ SDL_Surface *hough(SDL_Surface *image)
         {
             int i = -HOUGH_MARGIN;
             int j = -HOUGH_MARGIN;
-            int val = accu[rhos + i + (theta + j) * rhos];
+            int val = accu[rhos + theta * rhos];
             
             if (val > COUNT)
             {
@@ -299,7 +299,10 @@ SDL_Surface *hough(SDL_Surface *image)
                 {
                     while(j < HOUGH_MARGIN+1)
                     {
-                        accu[rho + i + (theta + j) * rhos] = 0;
+                        if (i != 0 && j != 0)
+                        {
+                            accu[rho + i + (theta + j) * rhos] = 0;
+                        }
                         j++;
                     }
                     i++;
@@ -308,10 +311,10 @@ SDL_Surface *hough(SDL_Surface *image)
         }
     }
 
-    drawHough(accu,image);
+    //drawHough(accu,image);
     detectAngle(image,accu,intersectList);
-    drawIntersect(image,intersectList);
-    //drawLargestSquare(image,intersectList);
+    //drawIntersect(image,intersectList);
+    drawLargestSquare(image,intersectList);
     //cutImage(image,intersectList);
 
     IMG_SavePNG(image, "tmp/hough.png");

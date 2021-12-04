@@ -242,7 +242,7 @@ SDL_Surface *Binarize(SDL_Surface *image, int k)
     if (k == 1)
     {
         // Apply binarization using Adaptive Threshold method
-        binarized = AdaptiveThresholdingBinarization(grayscaled, 0.6); 
+        binarized = AdaptiveThresholdingBinarization(grayscaled, 0.50); 
     }
     else
     {
