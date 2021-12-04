@@ -70,9 +70,11 @@ void on_menuitm_close_activate()
 // Solve button
 void on_btn_solve_clicked(app_widgets *app_wdgts)
 {
-    MakeGrid("output/output");
-    gridpath = "output/output.png";
-    gtk_image_set_from_file(GTK_IMAGE(widgets->w_grid), gridpath);
+    if (!MakeGrid("output/output.result"))
+    {
+        gridpath = "output/output.png";
+        gtk_image_set_from_file(GTK_IMAGE(widgets->w_grid), gridpath);
+    }
 }
 
 // Image selection button

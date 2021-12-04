@@ -12,7 +12,7 @@
 #include "loader.h"
 
 void file2grid(char *path);
-SDL_Surface *GetNumberSurface(char *c);
+SDL_Surface *GetDigitSurface(char *c);
 int MakeGrid(char *path);
 
 #endif
