@@ -6,9 +6,10 @@
 #define radToDeg(angleInRadians) ((angleInRadians) * 180.0 / M_PI)
 #define COUNT 300
 #define MARGIN 5
-#define SQUARE_MARGIN 10
+#define SIDE_MARGIN 7
 #define THETAS 91
 #define HOUGH_MARGIN 2
+#define SQUARE_MARGIN 0
 
 void drawHough (int *accu, SDL_Surface *image)
 {
@@ -161,7 +162,7 @@ void recDetectLargestSquare(SDL_Surface *image, int *intersectList, int x1, int 
                             sideY = abs(y2-y1);
                         }
                         //printf("%d,%d\n",sideX,sideY);
-                        if (sideX > sideY - SQUARE_MARGIN && sideX < sideY + SQUARE_MARGIN && sideX > *side)
+                        if (sideX > sideY - SIDE_MARGIN && sideX < sideY + SIDE_MARGIN && sideX > *side + SQUARE_MARGIN)
                         {
                             *side = sideX;
                             *x = x1;
@@ -246,7 +247,7 @@ void cutImage(SDL_Surface *image, int *intersectList)
     }
 }
 
-void Hough(SDL_Surface *image)
+SDL_Surface *hough(SDL_Surface *image)
 {
     int width = image->w;
     int height = image->h;
@@ -284,30 +285,13 @@ void Hough(SDL_Surface *image)
         }
     }
 
-    /*for (int rho = HOUGH_MARGIN; rho < rhos-HOUGH_MARGIN; rho++)
+    for (int rho = HOUGH_MARGIN; rho < rhos-HOUGH_MARGIN+1; rho++)
     {
-        for (int theta = HOUGH_MARGIN; theta < THETAS-HOUGH; theta++)
+        for (int theta = HOUGH_MARGIN; theta < THETAS-HOUGH_MARGIN+1; theta++)
         {
-            int sum = 0;
             int i = -HOUGH_MARGIN;
-            int  j = -HOUGH_MARGIN;
-            short check = 1;
+            int j = -HOUGH_MARGIN;
             int val = accu[rhos + i + (theta + j) * rhos];
-            /*while(check && i < 2)
-            {
-                while(check && j < 2)
-                {
-                    int val = accu[rhos + i + (theta + j) * rhos];
-                    if(val > COUNT)
-                    {
-                        sum += val;
-                    }
-                    else
-                        check = 0;
-                    j++;
-                }
-                i++;
-            }
             
             if (val > COUNT)
             {
@@ -320,24 +304,20 @@ void Hough(SDL_Surface *image)
                     }
                     i++;
                 }
-                /*accu[rho + 1 + (theta+1) * rhos] = 0;
-                accu[rho + 1 + theta * rhos] = 0;
-                accu[rho + 1 + (theta-1) * rhos] = 0;
-                accu[rho + (theta+1) * rhos] = 0;
-                accu[rho + (theta-1) * rhos] = 0;
-                accu[rho - 1 + (theta+1) * rhos] = 0;
-                accu[rho - 1 + theta * rhos] = 0;
-                accu[rho - 1 + (theta-1) * rhos] = 0;
             }
         }
-    }*/
+    }
 
-    //drawHough(accu,image);
+    drawHough(accu,image);
     detectAngle(image,accu,intersectList);
-    //drawIntersect(image,intersectList);
-    drawLargestSquare(image,intersectList);
+    drawIntersect(image,intersectList);
+    //drawLargestSquare(image,intersectList);
     //cutImage(image,intersectList);
+
+    IMG_SavePNG(image, "tmp/hough.png");
 
     free(accu);
     free(intersectList);
+
+    return image;
 }

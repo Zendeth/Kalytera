@@ -20,6 +20,6 @@ void drawIntersect(SDL_Surface *image, int *intersectList);
 void recDetectLargestSquare(SDL_Surface *image, int *intersectList, int x1, int y1, int *x, int  *y, int *side);
 void detectLargestSquare(SDL_Surface *image, int *intersectList, int *x, int  *y, int *side);
 void drawLargestSquare(SDL_Surface *image, int *intersectList);
-void Hough(SDL_Surface *image);
+SDL_Surface *hough(SDL_Surface *image);
 
 #endif
