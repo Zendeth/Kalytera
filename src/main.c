@@ -69,10 +69,13 @@ void Rot(SDL_Surface *image)
     scanf(" %c",&c);
     if (c == 'Y' || c == 'y')
     {
-        printf("Enter the skew angle: ");
+        printf("Enter the skew angle (enter . for auto): ");
         double a;
         scanf(" %lf",&a);
-        image = Deskew(image, a);
+        if (a == 0.0)
+            image = AutoRotate(image);
+        else
+            image = ManualRotate(image, a);
     }
     if (c != 'Y' && c != 'y' && c != 'N' && c != 'n')
     {
@@ -114,7 +117,7 @@ void Hough(SDL_Surface *image)
     }
 }
 
-int main(int argc, char *argv[])
+int main1(int argc, char *argv[])
 {
     if (argc != 2)
     {
@@ -170,6 +173,7 @@ int main(int argc, char *argv[])
     }
     
     // Hough test (by David)
+
     remove("tmp/hough.png");
     Hough(image);
     if(!access("tmp/hough.png", F_OK ))
@@ -184,4 +188,10 @@ int main(int argc, char *argv[])
     SDL_FreeSurface(image);
 
     return EXIT_SUCCESS;
+}
+
+int main(int argc, char *argv[])
+{
+    int i = launch_gui();
+    return i;
 }

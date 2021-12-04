@@ -4,116 +4,98 @@
 */
 #include "deskew.h"
 
-int maxofcol(int *matrix, int col, int length)
+// Find values of rho and theta
+struct values *winner(int maxrho, int maxtheta, int maxrholen,
+                                            int accu[maxtheta][maxrholen])
 {
-    int max = matrix[col];
-    for (int i = 1; i < length; i++)
+    double max = 0, winrho = 0, wintheta = 0;
+
+    for (int r = 0; r < maxrholen; r++)
     {
-        if (max < matrix[col+i])
+        for (int t = 0; t < maxtheta; t++)
         {
-            max = matrix[col+i];
+            if (accu[t][r] < max) continue;
+            max = accu[t][r];
+            winrho = r;
+            wintheta = t;
         }
     }
-    return max;
+    
+    double rho = ((double) winrho / maxrholen - 0.5) * maxrho;
+    double theta = 1.5621178940501734278001322309137322008610 
+                        - ((double) wintheta / maxtheta) * M_PI;
+
+    struct values *values = malloc(sizeof(struct values));
+
+    values->rho = rho;
+    values->theta = theta;
+
+    return values;
 }
 
-int index_of_max(int array[], int length)
+// voting function using an accumulator
+void vote(int x, int y, int maxrho, int maxtheta, int maxrholen,
+                    int accu[maxtheta][maxrholen], SDL_Surface *img)
 {
-    int i = 0;
-    int max = array[i];
-    for (i = 1; i < length; i++)
+    Uint8 r, g, b;
+    SDL_GetRGB(get_pixel(img, x, y), img->format, &r, &g, &b); 
+
+    if (!(r == 0 && g == 0 && b == 0)) // not black
+        return;
+
+    for (int theta_index = 0; theta_index < maxtheta; theta_index++)
     {
-        if (max < array[i])
-        {
-            max = array[i];
-        }
+        double theta = ((double) theta_index / maxtheta) * M_PI;
+        double rho = x * cos(theta) + y * sin(theta);
+        int rho_index = (int) (0.5 + (rho / maxrho + 0.5) * maxrholen);
+        accu[theta_index][rho_index]++;
     }
-    return i;
 }
 
-// Determine a skew angle using Hough transform method
-// 2nd Method : better performance, not perfecty working
-double find_angle2(SDL_Surface *image)
-{
-    double angle=0;
-    double ro;
-    int pmax = sqrt((image->w*image->w) + (image->h*image->h));
-    int *htable = calloc(pmax*90, sizeof(int));
-    int arraymax[450];
-    int index_arraymax = 0;
-    int p;
-    int maxival;
-
-    // Calculate distance for different angles
-    // And increment votes on accumulator accordingly
-    for (double theta = 0; theta < 45; theta += 0.2)
-    {
-        for (int j = 0; j < image->h; ++j)
-        {
-            for (int i = 0; i < image->w; ++i)
-            {
-                Uint32 pixel = get_pixel(image, i, j);
-                if (pixel == 0)
-                {
-                    ro = i * cos((theta*M_PI)/180) + j *sin((theta*M_PI)/180);
-                    p = (int) ro + (int)(theta * 10);
-                    htable[p]++;
-                }
-            }
-        }
-        if (((int)theta*10+1) % 90 == 0)
-        {
-            for (int k = 0; k <= 90; k++)
-            {
-                arraymax[index_arraymax] = maxofcol(htable,k,90);
-                index_arraymax++;
-            }
-            
-        }
-        memset(htable, 0, pmax*90);
-    }
-    maxival = index_of_max(arraymax, 450);
-    angle = maxival/10;
-
-    free(htable);
-    return angle;
-}
-
-// Determine a skew angle using Hough transform method
-// 1st method : bad performance, not perfectly working
+// Determine tha angle for the rotation
 double find_angle(SDL_Surface *image)
 {
-    double angle=0;
-    double ro;
-    int max = sqrt((image->w*image->w) + (image->h*image->h));
-    int *accu = calloc(max*180, sizeof(int));
+    int width = image->w;
+    int height = image->h;
+    int maxrho = sqrt(width * width + height * height);
+    int maxrholen = maxrho + 1;
+    int maxtheta = 360;
+    int accu[maxtheta][maxrholen];
 
-    int maxvote = 0;
-
-    // Calculate distance for different angles
-    // And increment votes on accumulator accordingly
-    for (int j = 0; j < image->h; ++j)
-    {
-        for (int i = 0; i < image->w; ++i)
-        {
-            for (double theta = 0; theta < 180; theta += 0.2)
-            {
-                ro = i * cos(theta) + j *sin(theta);
-                accu[(int) ro + (int)theta * max]++;
-                if (accu[(int) ro + (int)theta * max] >= maxvote)
-                {
-                    maxvote = accu[(int) ro + (int)theta * max];
-                    angle = theta;
-                }
-            }
+    for (int i = 0; i < maxtheta; i++) {
+        for (int j = 0; j < maxrholen; j++) {
+            accu[i][j] = 0;
         }
     }
 
-    free(accu);
+    for (int x = 0; x < width; x++)
+    {
+        for (int y = 0; y < height; y++)
+        {
+            vote(x, y, maxrho, maxtheta, maxrholen, accu, image);
+        }
+    }
+
+    struct values *values = winner(maxrho, maxtheta, maxrholen, accu);
+    double angle = values->theta * 180 / M_PI;
+
+    //printf("theta: %f \n", values->theta);
+    //printf("rho: %f \n", values->rho);
+    //printf("angle: %f \n", angle);
+
+    if (values->theta < 0 && values->rho > 0)
+        angle += 177.8;
+    if (values->theta > 0 && values->rho < 0)
+        angle -= 180;
+
+    angle = (values->theta < 0) ? -angle + values->theta : -angle - values->theta;
+    
+    printf("angle after adjust: %f \n", angle);
+
     return angle;
 }
 
-// Rotate a SDL_Surface using an angle
+// Rotate a SDL_Surface using a given angle
 SDL_Surface *Rotate(SDL_Surface *image, double angle)
 {
     angle = -angle * M_PI / 180;
@@ -152,20 +134,22 @@ SDL_Surface *Rotate(SDL_Surface *image, double angle)
     return output;
 }
 
-//Auto Deskew function
-SDL_Surface *AutoDeskew(SDL_Surface *image)
+//Auto Rotate function
+SDL_Surface *AutoRotate(SDL_Surface *image)
 {
-    double angle = find_angle2(image);
+    double angle = find_angle(image);
     image = Rotate(image, angle);
+    
+    IMG_SavePNG(image, "tmp/rotate.png");
 
     return image;
 }
 
-// Manual deskew function
-SDL_Surface *Deskew(SDL_Surface *image, double angle)
+// Manual rotate function
+SDL_Surface *ManualRotate(SDL_Surface *image, double angle)
 {
     image = Rotate(image, angle);
-    IMG_SavePNG(image, "tmp/deskew.png");
+    IMG_SavePNG(image, "tmp/rotate.png");
 
     return image;
 }
