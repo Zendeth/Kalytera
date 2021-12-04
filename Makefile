@@ -20,7 +20,7 @@ kalytera-solver: setup
 	$(CC) $(CFLAGS) src/solver/*.c -o solver
 	
 Kalytera-XOR : setup
-	$(CC) $(CFLAGS) src/XOR/*.c -o xor
+	$(CC) $(CFLAGS) XOR/*.c -o xor
 
 sobel:
 	$(CC) $(CFLAGS) $(LDLIBS) -o bin/sobel.o -c src/sobel.c

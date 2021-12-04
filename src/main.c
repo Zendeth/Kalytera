@@ -101,6 +101,22 @@ void Sobl(SDL_Surface *image)
     }
 }
 
+void Hough(SDL_Surface *image)
+{
+    printf("Do you want to detect the grid with Hough? [Y/N]: ");
+    char c;
+    scanf(" %c",&c);
+    if (c == 'Y' || c == 'y')
+    {
+        image = hough(image);
+    }
+    if (c != 'Y' && c != 'y' && c != 'N' && c != 'n')
+    {
+        printf("Error : Please retry\n");
+        Hough(image);
+    }
+}
+
 int main1(int argc, char *argv[])
 {
     if (argc != 2)
@@ -157,8 +173,19 @@ int main1(int argc, char *argv[])
     }
     
     // Hough test (by David)
+
+    remove("tmp/hough.png");
     Hough(image);
-    IMG_SavePNG(image, "tmp/hough.png");
+    if(!access("tmp/hough.png", F_OK ))
+    {
+        display("tmp/hough.png");
+
+        // Getting hough image
+        path = "tmp/hough.png";
+        image = load_img(path);
+    }
+
+    SDL_FreeSurface(image);
 
     return EXIT_SUCCESS;
 }
