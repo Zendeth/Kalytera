@@ -101,7 +101,7 @@ void Sobl(SDL_Surface *image)
     }
 }
 
-int main(int argc, char *argv[])
+int main1(int argc, char *argv[])
 {
     if (argc != 2)
     {
@@ -161,4 +161,10 @@ int main(int argc, char *argv[])
     IMG_SavePNG(image, "tmp/hough.png");
 
     return EXIT_SUCCESS;
+}
+
+int main(int argc, char *argv[])
+{
+    int i = launch_gui();
+    return i;
 }
