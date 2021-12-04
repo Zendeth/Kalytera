@@ -735,7 +735,7 @@
                 <property name="name">grid</property>
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
-                <property name="stock">gtk-missing-image</property>
+                <property name="pixbuf">grid.jpg</property>
               </object>
               <packing>
                 <property name="left-attach">1</property>
