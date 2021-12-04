@@ -1,7 +1,13 @@
+/*
+// Grid make functions
+// Author: Hafid HOUSNI
+*/
 #include "grid.h"
 
+// Matrix 9*9 representing the grid
 char grid[9][9];
 
+// Read the file and make the grid matrix
 void file2grid(char *path)
 {
     FILE *fp = fopen(path,"r");
@@ -40,6 +46,7 @@ void file2grid(char *path)
     fclose(fp);
 }
 
+// Make a Surface from digit char
 SDL_Surface *GetDigitSurface(char *c)
 {
     TTF_Init();
@@ -52,6 +59,7 @@ SDL_Surface *GetDigitSurface(char *c)
     return number;
 }
 
+// Function to make the grid image
 int MakeGrid(char *path)
 {
     char *img = "assets/grid.jpg";
@@ -65,14 +73,12 @@ int MakeGrid(char *path)
     {
         for (size_t j = 0; j < 9; j++)
         {
-            //printf("%c |", grid[i][j]);
             char c[] = { ' ', (grid[i][j]), ' ', 0};
             digit = GetDigitSurface(c);
             gridrect.x = j*67 + 15;
             gridrect.y = i*67 + 15;
             SDL_BlitSurface(digit, NULL, sdk, &gridrect);
         }
-        //printf("\n");
     }
     IMG_SavePNG(sdk, "output/output.png");
     SDL_FreeSurface(digit);
