@@ -5,16 +5,15 @@
 
 CC=gcc
 CFLAGS=-Wall -Wextra -std=c99 -O3 -g -D__NO_INLINE__
-LDLIBS=-lSDL2 -lSDL2_image -lm `sdl2-config --cflags --libs`
+LDLIBS=-lSDL2 -lSDL2_image -lSDL2_ttf -lm `sdl2-config --cflags --libs`
 LDFLAGS = -fsanitize=address
 GTK=`pkg-config --cflags --libs gtk+-3.0` -export-dynamic
-
 
 all: build
 
 build: kalytera-ocr kalytera-solver Kalytera-XOR
 
-kalytera-ocr: setup pixel_operations sobel preprocess binarize loader hough main-ocr
+kalytera-ocr: setup pixel_operations sobel preprocess binarize loader grid hough main-ocr
 	$(CC) $(CFLAGS) $(GTK) bin/*.o $(LDLIBS) -o kalytera-ocr
 
 kalytera-solver: setup
@@ -40,17 +39,20 @@ binarize:
 loader:
 	$(CC) $(CFLAGS) $(LDLIBS) -o bin/loader.o -c src/loader.c
 
+grid:
+	$(CC) $(CFLAGS) $(LDLIBS) -o bin/grid.o -c src/grid.c
+
 pixel_operations:
 	$(CC) $(CFLAGS) $(LDLIBS) -o bin/pixel_operations.o -c src/pixel_operations.c
 
 main-ocr:
+	$(CC) $(CFLAGS) $(LDLIBS) $(GTK) -o bin/gui.o -c src/gui.c
 	$(CC) $(CFLAGS) $(LDLIBS) $(GTK) -o bin/main.o -c src/main.c
 
 hough:
 	$(CC) $(CFLAGS) $(LDLIBS) $(GTK) -o bin/hough.o -c src/hough.c
 
 setup : fix_libs setup_dirs
-
 
 setup_dirs:
 	mkdir -p tmp
