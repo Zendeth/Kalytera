@@ -57,7 +57,7 @@ int MakeGrid(char *path)
     char *img = "assets/grid.jpg";
     SDL_Surface *sdk = load_img(img);
     SDL_Surface *digit;
-    SDL_Rect digitrect, gridrect;
+    SDL_Rect gridrect;
     
     file2grid(path);
 
@@ -70,9 +70,7 @@ int MakeGrid(char *path)
             digit = GetDigitSurface(c);
             gridrect.x = j*67 + 15;
             gridrect.y = i*67 + 15;
-            digitrect.h = 36;
-            digitrect.w = 36;
-            SDL_BlitSurface(digit, &digitrect, sdk, &gridrect);
+            SDL_BlitSurface(digit, NULL, sdk, &gridrect);
         }
         //printf("\n");
     }
