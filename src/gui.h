@@ -20,6 +20,7 @@
 #include "hough.h"
 #include "sobel.h"
 #include "grid.h"
+#include "main.h"
 
 int launch_gui();
 #endif

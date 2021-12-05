@@ -140,7 +140,7 @@ SDL_Surface *AutoRotate(SDL_Surface *image)
     double angle = find_angle(image);
     image = Rotate(image, angle);
     
-    IMG_SavePNG(image, "tmp/rotate.png");
+    IMG_SavePNG(image, "tmp/deskew.png");
 
     return image;
 }
@@ -149,7 +149,7 @@ SDL_Surface *AutoRotate(SDL_Surface *image)
 SDL_Surface *ManualRotate(SDL_Surface *image, double angle)
 {
     image = Rotate(image, angle);
-    IMG_SavePNG(image, "tmp/rotate.png");
+    IMG_SavePNG(image, "tmp/deskew.png");
 
     return image;
 }
