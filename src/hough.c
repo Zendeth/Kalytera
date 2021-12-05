@@ -4,9 +4,9 @@
 
 #define degToRad(angleInDegrees) ((angleInDegrees) * M_PI / 180.0)
 #define radToDeg(angleInRadians) ((angleInRadians) * 180.0 / M_PI)
-#define COUNT 310 //thereshold of the hough transformation
+#define COUNT 315 //thereshold of the hough transformation
 #define MARGIN 5 //number of line and colomn checked for when looking for a square at a pos
-#define SIDE_MARGIN 2 //margin of error for deciding if the shape is a rectangle or a square
+#define SIDE_MARGIN 5 //margin of error for deciding if the shape is a rectangle or a square
 #define THETAS 91 //from 0 to THETAS angles check for Hough
 #define HOUGH_MARGIN 5 //distance too look around a pos in the accu in order to reduce the number of line
 #define SQUARE_MARGIN 10 //margin of error to decide if a square is bigger than the previous
