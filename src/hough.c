@@ -319,7 +319,7 @@ SDL_Surface *hough(SDL_Surface *image)
 
     IMG_SavePNG(image, "tmp/hough.png");
 
-    free(accu);
+    //free(accu);
     free(intersectList);
 
     return image;

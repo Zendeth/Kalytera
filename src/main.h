@@ -12,6 +12,7 @@
 #include "deskew.h"
 #include "hough.h"
 #include "sobel.h"
+#include "grid.h"
 #include "gui.h"
 
 void display(char *path);

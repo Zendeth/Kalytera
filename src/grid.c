@@ -1,7 +1,13 @@
+/*
+// Grid make functions
+// Author: Hafid HOUSNI
+*/
 #include "grid.h"
 
+// Matrix 9*9 representing the grid
 char grid[9][9];
 
+// Read the file and make the grid matrix
 void file2grid(char *path)
 {
     FILE *fp = fopen(path,"r");
@@ -40,11 +46,12 @@ void file2grid(char *path)
     fclose(fp);
 }
 
-SDL_Surface *GetNumberSurface(char *c)
+// Make a Surface from digit char
+SDL_Surface *GetDigitSurface(char *c)
 {
     TTF_Init();
     TTF_Font *font = TTF_OpenFont("assets/arial.ttf", 32);
-    SDL_Color bg = { 255, 0, 0, 255 };
+    SDL_Color bg = { 255, 255, 255, 255 };
     SDL_Color fg = { 0, 0, 0, 0};
     SDL_Surface *number = TTF_RenderText_Shaded(font, c, fg, bg);
     TTF_CloseFont(font);
@@ -52,12 +59,13 @@ SDL_Surface *GetNumberSurface(char *c)
     return number;
 }
 
+// Function to make the grid image
 int MakeGrid(char *path)
 {
     char *img = "assets/grid.jpg";
-
     SDL_Surface *sdk = load_img(img);
-    SDL_Rect digitrect, gridrect;
+    SDL_Surface *digit;
+    SDL_Rect gridrect;
     
     file2grid(path);
 
@@ -65,18 +73,15 @@ int MakeGrid(char *path)
     {
         for (size_t j = 0; j < 9; j++)
         {
-            printf("%c |", grid[i][j]);
             char c[] = { ' ', (grid[i][j]), ' ', 0};
-            SDL_Surface *digit = GetNumberSurface(c);
+            digit = GetDigitSurface(c);
             gridrect.x = j*67 + 15;
             gridrect.y = i*67 + 15;
-            SDL_BlitSurface(digit, &digitrect, sdk, &gridrect);
-            SDL_FreeSurface(digit);
+            SDL_BlitSurface(digit, NULL, sdk, &gridrect);
         }
-        printf("\n");
     }
     IMG_SavePNG(sdk, "output/output.png");
-
+    SDL_FreeSurface(digit);
     SDL_FreeSurface(sdk);
 
     return EXIT_SUCCESS;

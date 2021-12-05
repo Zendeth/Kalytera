@@ -237,9 +237,10 @@ SDL_Surface *Binarize(SDL_Surface *image, int k)
 {
     // Apply grayscale
     SDL_Surface *grayscaled = Img_to_Grayscale(image);
-    SDL_Surface *binarized ;
+    IMG_SavePNG(grayscaled, "tmp/grayscaled.png");
+    SDL_Surface *binarized;
 
-    if (k == 1)
+    if (k)
     {
         // Apply binarization using Adaptive Threshold method
         binarized = AdaptiveThresholdingBinarization(grayscaled, 0.50); 
@@ -249,8 +250,9 @@ SDL_Surface *Binarize(SDL_Surface *image, int k)
         // Apply binarization using Otsu
         binarized = OtsuBinarization(grayscaled);
     }
-    
-    IMG_SavePNG(binarized, "tmp/binarized.png");
 
+    IMG_SavePNG(binarized, "tmp/binarized.png");
+    SDL_FreeSurface(grayscaled);
+    
     return binarized;
 }

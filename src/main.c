@@ -196,8 +196,10 @@ int main(int argc, char *argv[])
     return EXIT_SUCCESS;
 }
 
-/*int main(int argc, char *argv[])
+int main(int argc, char *argv[])
 {
-    int i = launch_gui();
-    return i;
-}*/
+
+    launch_gui();
+    //MakeGrid("output/output.result");
+    return EXIT_SUCCESS;
+}
